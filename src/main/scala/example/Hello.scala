@@ -17,13 +17,14 @@ object Hello extends App {
       println(s"$v arrived from stream")
       if (v == 4) {
       throw new IllegalArgumentException("4 on stream")
-    } else v}.runWith(Sink.actorRefWithAck(self, "initMessage", "ackMessage", "completeMessage"))
+    } else v}.runWith(Sink.actorRefWithAck(self, "initMessage", "ackMessage", "completeMessage", onFailureMessage = err => err))
     var counter: Int = 0
 
     def receive = {
       case "initMessage" =>
         println("init message arrived ")
         sender() ! "ackMessage"
+      case err: IllegalArgumentException => throw err
       case _ =>
         sender() ! "ackMessage"
 
